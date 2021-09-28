@@ -27,3 +27,10 @@ void sqrtSerial(int N,
     }
 }
 
+void sqrtVector(int N,
+                float initialGuess,
+                float values[],
+                float output[])
+{
+    // TODO
+}

@@ -67,10 +67,11 @@ export void mandelbrot_ispc_withtasks(uniform float x0, uniform float y0,
                                       uniform int maxIterations,
                                       uniform int output[])
 {
+    // assumes k is a power of 2
+    uniform int k = 16;
+    uniform int rowsPerTask = height / k;
 
-    uniform int rowsPerTask = height / 2;
-
-    // create 2 tasks
+    // create k tasks
     launch[2] mandelbrot_ispc_task(x0, y0, x1, y1,
                                      width, height,
                                      rowsPerTask,

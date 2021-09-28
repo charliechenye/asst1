@@ -29,13 +29,36 @@ extern void mandelbrotSerial(
 // Thread entrypoint.
 void workerThreadStart(WorkerArgs * const args) {
 
-    // TODO FOR CS149 STUDENTS: Implement the body of the worker
+    // DONE FOR CS149 STUDENTS: Implement the body of the worker
     // thread here. Each thread should make a call to mandelbrotSerial()
     // to compute a part of the output image.  For example, in a
     // program that uses two threads, thread 0 could compute the top
     // half of the image and thread 1 could compute the bottom half.
+    double startTime = CycleTimer::currentSeconds();
+    
+    /* Unbalanced Workload
+    unsigned int block_height = (args->height + args->numThreads - 1) / args->numThreads;
+    unsigned int start_row = args->threadId * block_height;
+    unsigned int row_count =  std::min<unsigned>(block_height, args->height - start_row);
+    mandelbrotSerial(args->x0, args->y0, args->x1, args->y1, args->width, args->height, start_row, row_count, args->maxIterations, args->output);
+    */
 
-    printf("Hello world from thread %d\n", args->threadId);
+    /* Balanced Workload
+    */
+    unsigned int n_squared = args->numThreads * args->numThreads;
+    unsigned int block_height = (args->height + n_squared - 1) / n_squared;
+    unsigned int n_block_height = (args->height + args->numThreads - 1) / args->numThreads;
+    for (int i = 0; i < args->numThreads; i++) {
+        unsigned int start_row = n_block_height * i + block_height * args->threadId;
+        unsigned int row_count = std::min<unsigned>(block_height, args->height - start_row);
+        mandelbrotSerial(args->x0, args->y0, args->x1, args->y1, args->width, args->height, start_row, row_count, args->maxIterations, args->output);
+    }
+
+    double endTime = CycleTimer::currentSeconds();
+    // printf("Hello world from thread %d\n", args->threadId);
+    // printf("Total rows: %d\n", args->height);
+    // printf("Thread %d Start Row: %d Row Count: %d\n", args->threadId, start_row, row_count);
+    printf("[thread %d]:\t\t[%.3f] ms\n", args->threadId, (endTime - startTime) * 1000);
 }
 
 //
@@ -63,7 +86,7 @@ void mandelbrotThread(
 
     for (int i=0; i<numThreads; i++) {
       
-        // TODO FOR CS149 STUDENTS: You may or may not wish to modify
+        // DONE FOR CS149 STUDENTS: You may or may not wish to modify
         // the per-thread arguments here.  The code below copies the
         // same arguments for each thread
         args[i].x0 = x0;
