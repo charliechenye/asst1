@@ -67,12 +67,12 @@ export void mandelbrot_ispc_withtasks(uniform float x0, uniform float y0,
                                       uniform int maxIterations,
                                       uniform int output[])
 {
-    // assumes k is a power of 2
+    // assumes k is a factor of 800 (# of rows in the file)
     uniform int k = 16;
     uniform int rowsPerTask = height / k;
 
     // create k tasks
-    launch[2] mandelbrot_ispc_task(x0, y0, x1, y1,
+    launch[k] mandelbrot_ispc_task(x0, y0, x1, y1,
                                      width, height,
                                      rowsPerTask,
                                      maxIterations,
